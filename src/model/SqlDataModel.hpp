@@ -23,7 +23,7 @@
 
 namespace model {
 
-#define ID_FIELD "id"
+#define FIELD_ID "id"
 
 class SqlDataModel: public bb::cascades::ArrayDataModel /*, model::SqlInterface */  {
 	Q_OBJECT
@@ -51,8 +51,15 @@ public:
 	Q_INVOKABLE void clear();
 	Q_SIGNAL void tableChanged();
 private:
-	QVariantList getIndexPathByID(int id);
+	Q_SLOT void onTableNameChanged(int uuid, const QString &tableName);
+	Q_SLOT void onCreatedRecord(int uuid, const QVariantMap &data, const qlonglong &id);
+	Q_SLOT void onDeletedRecord(int uuid, const int &id);
+	Q_SLOT void onDeletedRecord(int uuid, const QVariantMap &arguments, const QString &conditions);
+	Q_SLOT void onUpdatedRecord(int uuid, const QVariantMap &data);
+	QVariantList getIndexPathByID(const int &id);
+	QString m_table;
 	db::DataBaseController * m_dataBaseController;
+	int m_dbAccessUUID;
 };
 
 } /* namespace model */

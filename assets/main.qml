@@ -102,14 +102,29 @@ Page {
                         inputMode: TextFieldInputMode.EmailAddress
                     }
                 }
-                Button {
-                    text: qsTr("Create item") + Retranslate.onLocaleOrLanguageChanged
-                    horizontalAlignment: HorizontalAlignment.Fill
-                    onClicked: {
-                        var id = dtModel.create({
-                                "name": txtFldName.text,
-                                "last_name": txtFldLastName.text
-                            })
+                Container {
+                    layout: StackLayout {
+                        orientation: LayoutOrientation.LeftToRight
+                    }
+                    Button {
+                        text: qsTr("Create item") + Retranslate.onLocaleOrLanguageChanged
+                        horizontalAlignment: HorizontalAlignment.Fill
+                        onClicked: {
+                            var id = dtModel.create({
+                                    "name": txtFldName.text,
+                                    "last_name": txtFldLastName.text
+                                })
+                        }
+                    }
+                    Button {
+                        text: qsTr("db Create item") + Retranslate.onLocaleOrLanguageChanged
+                        horizontalAlignment: HorizontalAlignment.Fill
+                        onClicked: {
+                            var id = _db.create({
+                                    "name": txtFldName.text,
+                                    "last_name": txtFldLastName.text
+                                })
+                        }
                     }
                 }
                 Container {
@@ -127,40 +142,96 @@ Page {
                         inputMode: TextFieldInputMode.NumbersAndPunctuation
                     }
                 }
-                Button {
-                    text: qsTr("Read item") + Retranslate.onLocaleOrLanguageChanged
-                    horizontalAlignment: HorizontalAlignment.Fill
-                    onClicked: {
-                        var value = dtModel.read(parseInt(txtFldItem.text))
-                        sysTst.body = "Id: " + value["id"] + "; Name: " + value["name"] + "; Last name: " + value["last_name"]
-                        sysTst.show()
+                Container {
+                    layout: StackLayout {
+                        orientation: LayoutOrientation.LeftToRight
                     }
-                }
-                Button {
-                    text: qsTr("Remove item") + Retranslate.onLocaleOrLanguageChanged
-                    horizontalAlignment: HorizontalAlignment.Fill
-                    onClicked: {
-                        dtModel.deleteRecordById(parseInt(txtFldItem.text))
-                    }
-                }
-                Button {
-                    text: qsTr("Update item") + Retranslate.onLocaleOrLanguageChanged
-                    horizontalAlignment: HorizontalAlignment.Fill
-                    onClicked: {
-                        var value = {
-                            "id": parseInt(txtFldItem.text),
-                            "name": txtFldName.text,
-                            "last_name": txtFldLastName.text
+                    Button {
+                        text: qsTr("Read item") + Retranslate.onLocaleOrLanguageChanged
+                        horizontalAlignment: HorizontalAlignment.Fill
+                        onClicked: {
+                            var value = dtModel.read(parseInt(txtFldItem.text))
+                            sysTst.body = "Id: " + value["id"] + "; Name: " + value["name"] + "; Last name: " + value["last_name"]
+                            sysTst.show()
                         }
-                        dtModel.update(value)
+                    }
+                    Button {
+                        text: qsTr("db Read item") + Retranslate.onLocaleOrLanguageChanged
+                        horizontalAlignment: HorizontalAlignment.Fill
+                        onClicked: {
+                            var value = _db.read(parseInt(txtFldItem.text))
+                            sysTst.body = "Id: " + value["id"] + "; Name: " + value["name"] + "; Last name: " + value["last_name"]
+                            sysTst.show()
+                        }
                     }
                 }
-                Button {
-                    text: qsTr("Count") + Retranslate.onLocaleOrLanguageChanged
-                    horizontalAlignment: HorizontalAlignment.Fill
-                    onClicked: {
-                        sysTst.body = dtModel.count()
-                        sysTst.show()
+                Container {
+                    layout: StackLayout {
+                        orientation: LayoutOrientation.LeftToRight
+                    }
+                    Button {
+                        text: qsTr("Remove item") + Retranslate.onLocaleOrLanguageChanged
+                        horizontalAlignment: HorizontalAlignment.Fill
+                        onClicked: {
+                            dtModel.deleteRecordById(parseInt(txtFldItem.text))
+                        }
+                    }
+                    Button {
+                        text: qsTr("db Remove item") + Retranslate.onLocaleOrLanguageChanged
+                        horizontalAlignment: HorizontalAlignment.Fill
+                        onClicked: {
+                            _db.deleteRecord(parseInt(txtFldItem.text))
+                        }
+                    }
+                }
+                Container {
+                    layout: StackLayout {
+                        orientation: LayoutOrientation.LeftToRight
+                    }
+                    Button {
+                        text: qsTr("Update item") + Retranslate.onLocaleOrLanguageChanged
+                        horizontalAlignment: HorizontalAlignment.Fill
+                        onClicked: {
+                            var value = {
+                                "id": parseInt(txtFldItem.text),
+                                "name": txtFldName.text,
+                                "last_name": txtFldLastName.text
+                            }
+                            dtModel.update(value)
+                        }
+                    }
+                    Button {
+                        text: qsTr("db Update item") + Retranslate.onLocaleOrLanguageChanged
+                        horizontalAlignment: HorizontalAlignment.Fill
+                        onClicked: {
+                            var value = {
+                                "id": parseInt(txtFldItem.text),
+                                "name": txtFldName.text,
+                                "last_name": txtFldLastName.text
+                            }
+                            _db.update(value)
+                        }
+                    }
+                }
+                Container {
+                    layout: StackLayout {
+                        orientation: LayoutOrientation.LeftToRight
+                    }
+                    Button {
+                        text: qsTr("Count") + Retranslate.onLocaleOrLanguageChanged
+                        horizontalAlignment: HorizontalAlignment.Fill
+                        onClicked: {
+                            sysTst.body = dtModel.count()
+                            sysTst.show()
+                        }
+                    }
+                    Button {
+                        text: qsTr("db Count") + Retranslate.onLocaleOrLanguageChanged
+                        horizontalAlignment: HorizontalAlignment.Fill
+                        onClicked: {
+                            sysTst.body = _db.count()
+                            sysTst.show()
+                        }
                     }
                 }
                 Button {

@@ -26,7 +26,7 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
         QObject(app) {
 	SqlDataModel::registerQmlTypes();
 	QmlDocument::defaultDeclarativeEngine()->rootContext()->setContextProperty(
-			"_db", new DataBaseController(this));
+			"_db", DataBaseController::getInstance(this));
 	DataBaseController::createDB();
 	DataBaseController::createTables();
     // prepare the localization

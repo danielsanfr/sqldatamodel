@@ -10,13 +10,7 @@
 namespace db {
 
 DataBaseController::DataBaseController(QObject *parent) :
-		QObject(parent), m_tableName(TEST_TABLE), m_dataBaseCRUD(0) {
-	setCRUBInstanceByTableName();
-}
-
-DataBaseController::DataBaseController(QString tableName, QObject* parent) :
-		QObject(parent) {
-	m_tableName = tableName;
+		QObject(parent), m_UUIDs(-1), m_tableName(TEST_TABLE), m_dataBaseCRUD(0) {
 	setCRUBInstanceByTableName();
 }
 
@@ -55,18 +49,19 @@ void DataBaseController::createTables() {
 void DataBaseController::dropTables() {
 	QSqlDatabase database = QSqlDatabase::database();
 	QSqlQuery query(database);
-	QString clientTableQuery = "DROP TABLE IF EXISTS " + TEST_TABLE;
-	if (!query.exec(clientTableQuery))
+	QString testTableQuery = "DROP TABLE IF EXISTS " + TEST_TABLE;
+	if (!query.exec(testTableQuery))
 		qDebug()
 				<< "DataBaseController::dropTables:Test: Drop table error: "
 						+ query.lastError().text();
 	database.close();
 }
 
-void DataBaseController::setTableName(const QString &tableName) {
+void DataBaseController::setTableName(const QString &tableName, int uuid) {
 	Q_ASSERT(tableName == TEST_TABLE);
 	if (m_tableName != tableName) {
 		m_tableName = tableName;
+		emit tableNameChanged(uuid, tableName);
 		setCRUBInstanceByTableName();
 	}
 }
@@ -75,20 +70,25 @@ const QString& DataBaseController::tableName() {
 	return m_tableName;
 }
 
-qlonglong DataBaseController::create(const QVariantMap& data) const {
-	return m_dataBaseCRUD->create(data);
+qlonglong DataBaseController::create(const QVariantMap& data, int uuid) {
+	qlonglong id =  m_dataBaseCRUD->create(data);
+	emit createdRecord(uuid, data, id);
+	return id;
 }
 
-void DataBaseController::deleteRecord(const int& id) {
+void DataBaseController::deleteRecord(const int& id, int uuid) {
+	emit deletedRecord(uuid, id);
 	m_dataBaseCRUD->deleteRecord(id);
 }
 
 void DataBaseController::deleteRecord(const QVariantMap& arguments,
-		const QString& conditions) {
+		const QString& conditions, int uuid) {
+	emit deletedRecord(uuid, arguments, conditions);
 	m_dataBaseCRUD->deleteRecord(arguments, conditions);
 }
 
-void DataBaseController::update(const QVariantMap& data) {
+void DataBaseController::update(const QVariantMap& data, int uuid) {
+	emit updatedRecord(uuid, data);
 	m_dataBaseCRUD->update(data);
 }
 
@@ -105,13 +105,18 @@ const QVariantList DataBaseController::read(const QVariantMap& arguments,
 	return m_dataBaseCRUD->read(arguments, conditions);
 }
 
-int DataBaseController::count() const {
+int DataBaseController::count() {
 	return m_dataBaseCRUD->count();
 }
 
 int DataBaseController::count(const QVariantMap& arguments,
-		const QString& conditions) const {
+		const QString& conditions) {
 	return m_dataBaseCRUD->count(arguments, conditions);
+}
+
+int DataBaseController::getUUID() {
+	++m_UUIDs;
+	return m_UUIDs;
 }
 
 void DataBaseController::setCRUBInstanceByTableName() {
