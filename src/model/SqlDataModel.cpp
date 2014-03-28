@@ -22,23 +22,25 @@ SqlDataModel::SqlDataModel(QObject *parent) :
 	Q_ASSERT(isOk);
 	isOk =
 			connect(m_dataBaseController,
-					SIGNAL(createdRecord(int, const QVariantMap &, const qlonglong &)),
+					SIGNAL(createdRecord(int, const QString &, const QVariantMap &, const qlonglong &)),
 					this,
-					SLOT(onCreatedRecord(int, const QVariantMap &, const qlonglong &)));
+					SLOT(onCreatedRecord(int, const QString &, const QVariantMap &, const qlonglong &)));
 	Q_ASSERT(isOk);
 	isOk = connect(m_dataBaseController,
-			SIGNAL(deletedRecord(int, const int &)), this,
-			SLOT(onDeletedRecord(int, const int &)));
+			SIGNAL(deletedRecord(int, const QString &, const int &)), this,
+			SLOT(onDeletedRecord(int, const QString &, const int &)));
 	Q_ASSERT(isOk);
 	isOk =
 			connect(m_dataBaseController,
-					SIGNAL(deletedRecord(int, const QVariantMap &, const QString &)),
+					SIGNAL(deletedRecord(int, const QString &, const QVariantMap &, const QString &)),
 					this,
-					SLOT(onDeletedRecord(int, const QVariantMap &, const QString &)));
+					SLOT(onDeletedRecord(int, const QString &, const QVariantMap &, const QString &)));
 	Q_ASSERT(isOk);
-	isOk = connect(m_dataBaseController,
-			SIGNAL(updatedRecord(int, const QVariantMap &)), this,
-			SLOT(onUpdatedRecord(int, const QVariantMap &)));
+	isOk =
+			connect(m_dataBaseController,
+					SIGNAL(updatedRecord(int, const QString &, const QVariantMap &)),
+					this,
+					SLOT(onUpdatedRecord(int, const QString &, const QVariantMap &)));
 	Q_ASSERT(isOk);
 }
 
@@ -90,11 +92,14 @@ QVariantMap SqlDataModel::read(const int& id) {
 }
 
 QVariantList SqlDataModel::read() {
+	m_lastLoadConditions = "";
 	return m_dataBaseController->read();
 }
 
 QVariantList SqlDataModel::read(const QVariantMap& arguments,
 		const QString& conditions) {
+	m_lastLoadConditions = conditions;
+	m_lastLoadArguments = arguments;
 	return m_dataBaseController->read(arguments, conditions);
 }
 
@@ -122,7 +127,7 @@ void SqlDataModel::load(const QVariantMap& arguments,
 	append(m_dataBaseController->read(arguments, conditions));
 }
 
-void SqlDataModel::clear() {
+void SqlDataModel::clearRecords() {
 	int length = size();
 	for (int i = 0; i < length; ++i) {
 		m_dataBaseController->deleteRecord(value(0).toMap()["id"].toInt());
@@ -133,33 +138,52 @@ void SqlDataModel::clear() {
 void SqlDataModel::onTableNameChanged(int uuid, const QString& tableName) {
 }
 
-void SqlDataModel::onCreatedRecord(int uuid,
+void SqlDataModel::onCreatedRecord(int uuid, const QString &tableName,
 		const QVariantMap& data, const qlonglong& id) {
-	if (uuid != m_dbAccessUUID) {
+	if (uuid != m_dbAccessUUID && tableName == m_table) {
 		QVariantMap newData = data;
 		newData[FIELD_ID] = id;
 		append(newData);
+		if (m_lastLoadConditions == "")
+			load();
+		else
+			load(m_lastLoadArguments, m_lastLoadConditions);
 	}
 }
 
-void SqlDataModel::onDeletedRecord(int uuid, const int& id) {
-	if (uuid != m_dbAccessUUID) {
+void SqlDataModel::onDeletedRecord(int uuid, const QString &tableName,
+		const int& id) {
+	if (uuid != m_dbAccessUUID && tableName == m_table) {
 		QVariantList indexPath = getIndexPathByID(id);
 		int index = indexPath.back().toInt();
 		if (index != -1)
 			removeAt(index);
+		if (m_lastLoadConditions == "")
+			load();
+		else
+			load(m_lastLoadArguments, m_lastLoadConditions);
 	}
 }
 
-void SqlDataModel::onDeletedRecord(int uuid,
+void SqlDataModel::onDeletedRecord(int uuid, const QString &tableName,
 		const QVariantMap& arguments, const QString& conditions) {
+	if (uuid != m_dbAccessUUID && tableName == m_table) {
+		if (m_lastLoadConditions == "")
+			load();
+		else
+			load(m_lastLoadArguments, m_lastLoadConditions);
+	}
 }
 
-void SqlDataModel::onUpdatedRecord(int uuid,
+void SqlDataModel::onUpdatedRecord(int uuid, const QString &tableName,
 		const QVariantMap& data) {
-	if (uuid != m_dbAccessUUID) {
+	if (uuid != m_dbAccessUUID && tableName == m_table) {
 		QVariantList indexPath = getIndexPathByID(data[FIELD_ID].toInt());
 		replace(indexPath.back().toInt(), data);
+		if (m_lastLoadConditions == "")
+			load();
+		else
+			load(m_lastLoadArguments, m_lastLoadConditions);
 	}
 }
 

@@ -44,9 +44,7 @@ void DataBaseCRUD::deleteRecord(const QVariantMap& arguments,
 		const QString& conditions) {
 	QSqlDatabase database = QSqlDatabase::database();
 	QSqlQuery query(database);
-	const QString readQuery = "DELETE FROM " + getTableName() + " WHERE "
-			+ conditions;
-	query.prepare(readQuery);
+	query.prepare("DELETE FROM " + getTableName() + " WHERE " + conditions);
 	bindValuesOfQuery(query, arguments);
 	if (!query.exec()) {
 		qDebug()
@@ -80,8 +78,7 @@ const QVariantMap DataBaseCRUD::read(const int& id) const {
 const QVariantList DataBaseCRUD::read() const {
 	QSqlDatabase database = QSqlDatabase::database();
 	QSqlQuery query(database);
-	const QString sqlStatement = "SELECT * FROM " + getTableName();
-	query.prepare(sqlStatement);
+	query.prepare("SELECT * FROM " + getTableName());
 	QVariantList resultList = read(query);
 	database.close();
 	return resultList;
@@ -91,9 +88,7 @@ const QVariantList DataBaseCRUD::read(const QVariantMap& arguments,
 		const QString& conditions) {
 	QSqlDatabase database = QSqlDatabase::database();
 	QSqlQuery query(database);
-	const QString readQuery = "SELECT * FROM " + getTableName() + " WHERE "
-			+ conditions;
-	query.prepare(readQuery);
+	query.prepare("SELECT * FROM " + getTableName() + " WHERE " + conditions);
 	bindValuesOfQuery(query, arguments);
 	QVariantList resultList = read(query);
 	database.close();
@@ -103,9 +98,7 @@ const QVariantList DataBaseCRUD::read(const QVariantMap& arguments,
 int DataBaseCRUD::count() const {
 	QSqlDatabase database = QSqlDatabase::database();
 	QSqlQuery query(database);
-	const QString sqlQuery = "SELECT COUNT(1) AS \"size\" FROM "
-			+ getTableName();
-	query.prepare(sqlQuery);
+	query.prepare("SELECT COUNT(1) AS \"size\" FROM " + getTableName());
 	int size = count(query);
 	database.close();
 	return size;
@@ -115,9 +108,9 @@ int DataBaseCRUD::count(const QVariantMap& arguments,
 		const QString& conditions) const {
 	QSqlDatabase database = QSqlDatabase::database();
 	QSqlQuery query(database);
-	const QString countQuery = "SELECT COUNT(1) AS \"size\" FROM "
-			+ getTableName() + " WHERE " + conditions;
-	query.prepare(countQuery);
+	query.prepare(
+			"SELECT COUNT(1) AS \"size\" FROM " + getTableName() + " WHERE "
+					+ conditions);
 	bindValuesOfQuery(query, arguments);
 	int size = count(query);
 	database.close();
@@ -153,7 +146,8 @@ const QVariantList DataBaseCRUD::read(QSqlQuery& query) const {
 
 void DataBaseCRUD::bindValuesOfQuery(QSqlQuery& query,
 		const QVariantMap& arguments) const {
-	foreach(QString key, arguments.keys()) {
+	foreach(QString key, arguments.keys())
+	{
 		switch (arguments[key].type()) {
 		case QMetaType::Int:
 			query.bindValue(key, arguments[key].toInt());

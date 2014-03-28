@@ -61,8 +61,8 @@ void DataBaseController::setTableName(const QString &tableName, int uuid) {
 	Q_ASSERT(tableName == TEST_TABLE);
 	if (m_tableName != tableName) {
 		m_tableName = tableName;
-		emit tableNameChanged(uuid, tableName);
 		setCRUBInstanceByTableName();
+		emit tableNameChanged(uuid, tableName);
 	}
 }
 
@@ -72,24 +72,24 @@ const QString& DataBaseController::tableName() {
 
 qlonglong DataBaseController::create(const QVariantMap& data, int uuid) {
 	qlonglong id =  m_dataBaseCRUD->create(data);
-	emit createdRecord(uuid, data, id);
+	emit createdRecord(uuid, m_tableName, data, id);
 	return id;
 }
 
 void DataBaseController::deleteRecord(const int& id, int uuid) {
-	emit deletedRecord(uuid, id);
 	m_dataBaseCRUD->deleteRecord(id);
+	emit deletedRecord(uuid, m_tableName, id);
 }
 
 void DataBaseController::deleteRecord(const QVariantMap& arguments,
 		const QString& conditions, int uuid) {
-	emit deletedRecord(uuid, arguments, conditions);
 	m_dataBaseCRUD->deleteRecord(arguments, conditions);
+	emit deletedRecord(uuid, m_tableName, arguments, conditions);
 }
 
 void DataBaseController::update(const QVariantMap& data, int uuid) {
-	emit updatedRecord(uuid, data);
 	m_dataBaseCRUD->update(data);
+	emit updatedRecord(uuid, m_tableName, data);
 }
 
 const QVariantMap DataBaseController::read(const int& id) {

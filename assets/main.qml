@@ -238,7 +238,7 @@ Page {
                     text: qsTr("Clear") + Retranslate.onLocaleOrLanguageChanged
                     horizontalAlignment: HorizontalAlignment.Fill
                     onClicked: {
-                        dtModel.clear()
+                        dtModel.clearRecords()
                     }
                 }
             }

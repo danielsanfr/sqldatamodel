@@ -48,18 +48,20 @@ public:
 	Q_INVOKABLE int count(const QVariantMap &arguments, const QString &conditions);
 	Q_INVOKABLE void load();
 	Q_INVOKABLE void load(const QVariantMap &arguments, const QString &conditions);
-	Q_INVOKABLE void clear();
+	Q_INVOKABLE void clearRecords();
 	Q_SIGNAL void tableChanged();
 private:
 	Q_SLOT void onTableNameChanged(int uuid, const QString &tableName);
-	Q_SLOT void onCreatedRecord(int uuid, const QVariantMap &data, const qlonglong &id);
-	Q_SLOT void onDeletedRecord(int uuid, const int &id);
-	Q_SLOT void onDeletedRecord(int uuid, const QVariantMap &arguments, const QString &conditions);
-	Q_SLOT void onUpdatedRecord(int uuid, const QVariantMap &data);
+	Q_SLOT void onCreatedRecord(int uuid, const QString &tableName, const QVariantMap &data, const qlonglong &id);
+	Q_SLOT void onDeletedRecord(int uuid, const QString &tableName, const int &id);
+	Q_SLOT void onDeletedRecord(int uuid, const QString &tableName, const QVariantMap &arguments, const QString &conditions);
+	Q_SLOT void onUpdatedRecord(int uuid, const QString &tableName, const QVariantMap &data);
 	QVariantList getIndexPathByID(const int &id);
 	QString m_table;
 	db::DataBaseController * m_dataBaseController;
 	int m_dbAccessUUID;
+	QString m_lastLoadConditions;
+	QVariantMap m_lastLoadArguments;
 };
 
 } /* namespace model */

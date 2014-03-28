@@ -47,10 +47,10 @@ public:
 	Q_INVOKABLE int count(const QVariantMap &arguments, const QString &conditions);
 	Q_INVOKABLE int getUUID();
 	Q_SIGNAL void tableNameChanged(int uuid, const QString &tableName);
-	Q_SIGNAL void createdRecord(int uuid, const QVariantMap &data, const qlonglong &id);
-	Q_SIGNAL void deletedRecord(int uuid, const int &id);
-	Q_SIGNAL void deletedRecord(int uuid, const QVariantMap &arguments, const QString &conditions);
-	Q_SIGNAL void updatedRecord(int uuid, const QVariantMap &data);
+	Q_SIGNAL void createdRecord(int uuid, const QString &tableName, const QVariantMap &data, const qlonglong &id);
+	Q_SIGNAL void deletedRecord(int uuid, const QString &tableName, const int &id);
+	Q_SIGNAL void deletedRecord(int uuid, const QString &tableName, const QVariantMap &arguments, const QString &conditions);
+	Q_SIGNAL void updatedRecord(int uuid, const QString &tableName, const QVariantMap &data);
 private:
 	DataBaseController(QObject *parent = 0);
 	void setCRUBInstanceByTableName();
